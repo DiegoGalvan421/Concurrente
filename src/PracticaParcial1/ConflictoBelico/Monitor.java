@@ -12,7 +12,6 @@ public class Monitor {
         boolean imprimi=false;
         int oracion1 = idDiv;
         int oracion2 = (2 * cantidadDivs + 1) - idDiv;
-        boolean hecha = false;
 
         if(idDiv==siguiente){
             System.out.println(Thread.currentThread().getName()+":"+oracion1);

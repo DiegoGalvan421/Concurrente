@@ -30,9 +30,6 @@ public class LosToboganes {
         return hay;
     }
 
-    public int getCantidadDePersonas() {
-        return cantidadDePersonas;
-    }
 
     public boolean intentarSubir() {
         boolean pudoSubir = false;
