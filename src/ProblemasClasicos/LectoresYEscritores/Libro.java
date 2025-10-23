@@ -46,6 +46,9 @@ public class Libro {
         if (nEscritores == 1) {
             lectores.acquire(); // Bloquea lectores
         }
+        System.out.println("cantidad de pag antes: "+cantiPag);
+        cantiPag++;
+        System.out.println("cantidad de pag despues: "+cantiPag);
         mutex2.release();
         escritores.acquire(); // Exclusión mutua para escritores
     }
@@ -62,10 +65,10 @@ public class Libro {
     }
 
     public boolean finalizado() throws InterruptedException {
-        boolean terminado = false;
+        boolean terminado = true;
         mutex2.acquire();
-        if (cantiPag == totalPag) {
-            terminado = true;
+        if (cantiPag <= totalPag) {
+            terminado = false;
         }
         mutex2.release();
         return terminado;
@@ -77,11 +80,5 @@ public class Libro {
         hay = cantiPag > 0;
         mutex2.release();
         return hay;
-    }
-
-    public void escribir() throws InterruptedException {
-        mutex2.acquire();
-        cantiPag++;
-        mutex2.release();
     }
 }

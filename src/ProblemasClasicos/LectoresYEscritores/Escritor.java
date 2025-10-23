@@ -13,7 +13,6 @@ public class Escritor implements Runnable {
                 lib.empezarEscribir();
                 System.out.println("estoy escribiendo " + Thread.currentThread().getName());
                 Thread.sleep(500);
-                lib.escribir();
                 lib.terminarEscribir();
                 System.out.println("termine de escribir " + Thread.currentThread().getName());
             }
