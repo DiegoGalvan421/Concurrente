@@ -67,7 +67,7 @@ public class Libro {
     public boolean finalizado() throws InterruptedException {
         boolean terminado = true;
         mutex2.acquire();
-        if (cantiPag <= totalPag) {
+        if (cantiPag < totalPag) {
             terminado = false;
         }
         mutex2.release();

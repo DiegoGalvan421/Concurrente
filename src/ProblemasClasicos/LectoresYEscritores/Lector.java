@@ -13,6 +13,7 @@ public class Lector implements Runnable {
                 if (lib.hayEscrito()) {
                     lib.empezarLeer();
                     System.out.println("estoy leyendo " + Thread.currentThread().getName());
+                    //lib.escribir();
                     Thread.sleep(500);
                     lib.terminarLeer();
                     System.out.println("termine de leer " + Thread.currentThread().getName());
