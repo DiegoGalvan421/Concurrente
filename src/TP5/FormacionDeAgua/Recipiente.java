@@ -9,7 +9,8 @@ public class Recipiente {
     private Semaphore mutex = new Semaphore(1,true);
     private Semaphore hidrogeno = new Semaphore(0,true);
     private Semaphore oxigeno = new Semaphore(0,true);
-    private Semaphore barrera= new Semaphore(0,true);
+    private Semaphore terminarO= new Semaphore(0,true);
+    private Semaphore terminarH= new Semaphore(0,true);
 
     Recipiente(int aguaT){
         aguaMax=aguaT;
@@ -21,9 +22,7 @@ public class Recipiente {
     public void Olisto(){
         oxigeno.release();
     }
-    public void esperar()throws InterruptedException{
-        barrera.acquire();
-    }
+    
     public void hacerAgua()throws InterruptedException{
         oxigeno.acquire();
         hidrogeno.acquire(2);
@@ -35,7 +34,6 @@ public class Recipiente {
             aguaActual=0;
         }
         System.out.println("recipientes listo: "+recipientesListos);
-        barrera.release(2);
         mutex.release();
         
     }
