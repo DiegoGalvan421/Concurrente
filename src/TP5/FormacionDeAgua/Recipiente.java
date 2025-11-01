@@ -34,7 +34,16 @@ public class Recipiente {
             aguaActual=0;
         }
         System.out.println("recipientes listo: "+recipientesListos);
+        terminarO.release();
+        terminarH.release(2);
         mutex.release();
-        
+    }
+    public void terminarHid()throws InterruptedException{
+        // el hidrógeno debe esperar la señal que libera terminarH (2 permisos)
+        terminarH.acquire();
+    }
+    public void terminarOx()throws InterruptedException{
+        // el oxígeno espera la señal que libera terminarO (1 permiso)
+        terminarO.acquire();
     }
 }
