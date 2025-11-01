@@ -13,31 +13,47 @@ public class Observatorio {
     private Condition investigador = lock.newCondition();
     private int capacidadMax = 50;
     private int sillas = 0;
+    private int sillasEnEspera = 0;
     private int visitantes = 0;
     private int manteni = 0;
-    private boolean hayInvest=false;
+    private int visitantesHisotricos = 0;
+    private boolean hayInvest = false;
+    private int mantenimientoSeguido = 0;
+
     Observatorio() {
 
     }
-    //considerar sala de espera con silla de ruedas
+
+    // considerar sala de espera con silla de ruedas
     public void ingresarVis(Boolean tieneSilla) {
         lock.lock();
         try {
 
             if (tieneSilla) {
-                while (visitantes >= 30 || manteni != 0 || !hayInvest) {
+                sillasEnEspera++;
+                // esperar mientras esté lleno el cupo para sillas, haya mantenimiento
+                // en curso o haya un investigador (investigador es exclusivo)
+                while (visitantes >= 30 || manteni > 0 || hayInvest || visitantesHisotricos >= 60) {
                     sillaDeRuedas.await();
 
                 }
+                sillasEnEspera--;
                 capacidadMax = 30;
                 sillas++;
                 visitantes++;
+                visitantesHisotricos++;
 
             } else {
-                while (visitantes >= capacidadMax || manteni != 0 || !hayInvest) {
+                // visitantes normales esperan si se alcanzó la capacidad, hay mantenimiento,
+                // hay investigador (exclusivo), se llegó al tope historico o hay prioridad
+                // de personas con silla en espera.
+                while (visitantes >= capacidadMax || manteni > 0 || hayInvest || visitantesHisotricos >= 60
+                        || sillasEnEspera > 0) {
                     visitante.await();
                 }
                 visitantes++;
+                visitantesHisotricos++;
+                mantenimientoSeguido = 0;
 
             }
         } catch (InterruptedException e) {
@@ -57,73 +73,77 @@ public class Observatorio {
                 capacidadMax = 50;
             }
             if (visitantes == 0) {
-                investigador.signalAll();
                 mantenimiento.signalAll();
-                sillaDeRuedas.signalAll();
-                visitante.signalAll();
-            } else {
-                sillaDeRuedas.signal();
-                visitante.signal();
+                investigador.signalAll();
+
             }
         } else {
             visitantes--;
             if (visitantes == 0) {
-                investigador.signalAll();
                 mantenimiento.signalAll();
-                sillaDeRuedas.signalAll();
-                visitante.signalAll();
-            } else {
-                //puede ir afuera del if
-                sillaDeRuedas.signalAll();
-                visitante.signalAll();
+                investigador.signalAll();
+
             }
+
         }
+        sillaDeRuedas.signalAll();
+        visitante.signalAll();
         lock.unlock();
     }
 
     public void ingresarMant() {
         lock.lock();
         try {
-            while (visitantes>0 || !hayInvest) {
+            // mantenimiento sólo puede entrar cuando no hay visitantes y no hay
+            // investigador
+            while (visitantes > 0 || hayInvest || mantenimientoSeguido > 10) {
                 mantenimiento.await();
             }
             manteni++;
+            mantenimientoSeguido++;
+            visitantesHisotricos = 0;
         } catch (Exception e) {
             // TODO: handle exception
-        } finally {lock.unlock();
-        }
-    }
-
-    public void salirMant(){
-        lock.lock();
-        manteni--;
-            if(manteni==0){
-                investigador.signalAll();
-                sillaDeRuedas.signalAll();
-                visitante.signalAll();
-            }
-        lock.unlock();
-    }
-    public void ingresarInvest(){
-        lock.lock();
-        try {
-            while(visitantes!=0 || manteni!=0 || hayInvest){
-                investigador.await();
-            }
-            hayInvest=true;
-        } catch (Exception e) {
-            // TODO: handle exception
-        }finally{
+        } finally {
             lock.unlock();
         }
     }
-    public void salirInvest(){
+
+    public void salirMant() {
         lock.lock();
-        hayInvest=false;
-        investigador.signalAll();
-        mantenimiento.signalAll();
+        manteni--;
+        if (manteni == 0) {
+            investigador.signalAll();
+            sillaDeRuedas.signalAll();
+            visitante.signalAll();
+        }
+        lock.unlock();
+    }
+
+    public void ingresarInvest() {
+        lock.lock();
+        try {
+            // investigador necesita exclusividad: no visitantes ni mantenimiento ni otro
+            // investigador
+            while (visitantes > 0 || manteni > 0 || hayInvest) {
+                investigador.await();
+            }
+            hayInvest = true;
+            visitantesHisotricos = 0;
+        } catch (Exception e) {
+            // TODO: handle exception
+        } finally {
+            lock.unlock();
+        }
+    }
+
+    public void salirInvest() {
+        lock.lock();
+        hayInvest = false;
         sillaDeRuedas.signalAll();
         visitante.signalAll();
+        mantenimiento.signalAll();
+        investigador.signalAll();
         lock.unlock();
     }
 }
