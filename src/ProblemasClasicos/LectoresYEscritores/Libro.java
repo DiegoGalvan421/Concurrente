@@ -9,7 +9,7 @@ public class Libro {
     private Semaphore mutex2 = new Semaphore(1);
     private Semaphore lectores = new Semaphore(1);
     private Semaphore escritores = new Semaphore(1);
-    private Semaphore turno = new Semaphore(1); // Controla el turno entre lectores y escritores
+    private Semaphore turno = new Semaphore(1,true); // Controla el turno entre lectores y escritores
     private int nLectores = 0;
     private int nEscritores = 0;
 
