@@ -10,6 +10,7 @@ public class CocheNorte implements Runnable{
     public void run(){
         try {
             puen.cruzarNorte();
+            puen.terminarCruzarNorte();
         } catch (Exception e) {
             // TODO: handle exception
         }

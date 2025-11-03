@@ -22,6 +22,9 @@ public class Puente {
         norte.acquire();
         pasar.acquire();
         System.out.println("Me dejaron pasar norte " + Thread.currentThread().getName());
+        
+    }
+    public void terminarCruzarNorte()throws InterruptedException{
         mutex.acquire();
         norteEnEspera--;
         if (surEnEspera <= 1) {
@@ -35,15 +38,7 @@ public class Puente {
         pasar.release();
         mutex.release();
     }
-
-    public void cruzarSur() throws InterruptedException {
-        mutex.acquire();
-        surEnEspera++;
-        System.out.println("Estoy esperando a cruzar sur " + Thread.currentThread().getName());
-        mutex.release();
-        sur.acquire();
-        pasar.acquire();
-        System.out.println("Me dejaron pasar sur " + Thread.currentThread().getName());
+    public void terminarCruzarSur()throws InterruptedException{
         mutex.acquire();
         surEnEspera--;
         if (norteEnEspera <= 1) {
@@ -56,5 +51,14 @@ public class Puente {
         System.out.println("Termine de cruzar Sur" + Thread.currentThread().getName());
         pasar.release();
         mutex.release();
+    }
+    public void cruzarSur() throws InterruptedException {
+        mutex.acquire();
+        surEnEspera++;
+        System.out.println("Estoy esperando a cruzar sur " + Thread.currentThread().getName());
+        mutex.release();
+        sur.acquire();
+        pasar.acquire();
+        System.out.println("Me dejaron pasar sur " + Thread.currentThread().getName());
     }
 }

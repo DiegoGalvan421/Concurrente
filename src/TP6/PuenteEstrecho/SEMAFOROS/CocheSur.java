@@ -10,6 +10,7 @@ public class CocheSur implements Runnable{
     public void run(){
         try {
             puen.cruzarSur();
+            puen.terminarCruzarSur();
         } catch (Exception e) {
             // TODO: handle exception
         }
