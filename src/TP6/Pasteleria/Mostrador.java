@@ -24,7 +24,7 @@ public class Mostrador {
             while (cantidadPastelesAct == cantidadPastelesMax) {
                 hornos.await();
             }
-            pasteles.add(3);
+            pasteles.add(peso);
             cantidadPastelesAct++;
             System.out.println("hice un pastel, depsierto a los empacadores "+Thread.currentThread().getName());
             robots.signalAll();

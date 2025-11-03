@@ -52,13 +52,13 @@ public class MesaDeCaja {
                 robots.await();
             }
             if((peso+capacidadAct)>capacidadMax){
-                System.out.println("Confirmo que no pude poner un pastel "+Thread.currentThread().getName());
+                System.out.println("Confirmo que no pude poner un pastel de "+peso+"kg "+Thread.currentThread().getName());
                 confirmaciones++;
             }else{
                 System.out.println("Puse un pastel "+Thread.currentThread().getName());
                 capacidadAct+=peso;
             }
-            if((peso+capacidadAct)==capacidadMax || confirmaciones==cantidadRobots){
+            if(capacidadAct==capacidadMax || confirmaciones==cantidadRobots){
                 System.out.println("Termine la caja o se llegaron a las 3 confirmaciones, despierto al brazo "+Thread.currentThread().getName());
                 cajaLista=true;
                 confirmaciones=0;
