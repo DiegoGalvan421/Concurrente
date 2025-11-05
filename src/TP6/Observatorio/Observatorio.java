@@ -143,7 +143,7 @@ public class Observatorio {
         sillaDeRuedas.signalAll();
         visitante.signalAll();
         mantenimiento.signalAll();
-        investigador.signalAll();
+        investigador.signal();
         lock.unlock();
     }
 }

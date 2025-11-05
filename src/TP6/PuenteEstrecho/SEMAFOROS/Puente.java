@@ -9,11 +9,12 @@ public class Puente {
     private Semaphore pasar = new Semaphore(1,true);
     private int norteEnEspera = 0;
     private int surEnEspera = 0;
+    private int curcesSeguidos=0;
 
     Puente() {
 
     }
-
+    //no dar por hecho que empieza de un lado, hacer un if, que considere neutro hasta que llegue uno
     public void cruzarNorte() throws InterruptedException {
         mutex.acquire();
         norteEnEspera++;
@@ -27,7 +28,8 @@ public class Puente {
     public void terminarCruzarNorte()throws InterruptedException{
         mutex.acquire();
         norteEnEspera--;
-        if (surEnEspera <= 1) {
+        curcesSeguidos++;
+        if ((surEnEspera > 0 && curcesSeguidos<5)|| norteEnEspera==0) {
             System.out.println("no hay sur en espera, seguimos norte");
             norte.release();
         } else {
@@ -41,8 +43,9 @@ public class Puente {
     public void terminarCruzarSur()throws InterruptedException{
         mutex.acquire();
         surEnEspera--;
-        if (norteEnEspera <= 1) {
-            System.out.println("no hay sur en espera, seguimos sur");
+        curcesSeguidos++;
+        if ((norteEnEspera > 1 && curcesSeguidos<5)|| surEnEspera==0) {
+            System.out.println("no hay norte en espera, seguimos sur");
             sur.release();
         } else {
             System.out.println("Cambiamos direccion porque hay en espera norte");
