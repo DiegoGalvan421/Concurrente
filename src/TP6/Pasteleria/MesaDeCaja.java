@@ -48,6 +48,7 @@ public class MesaDeCaja {
     public void soltarPastel(int peso){
         lock.lock();
         try {
+            //corregir que no tire el pastel
             while(!cajaEnMostrador || cajaLista){
                 robots.await();
             }
