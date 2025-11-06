@@ -49,42 +49,53 @@ public class MesaDeCaja {
 
     public void soltarPastel(int peso) {
         lock.lock();
-        boolean coloco = false;
         boolean confirmo = false;
         try {
-            // corregir que no tire el pastel
+            // Esperar hasta que haya caja y que quepa el pastel
+            while (!cajaEnMostrador || cajaLista || (capacidadAct + peso > capacidadMax)) {
 
-            // si se vuelve a despertar es solo porque el brazo despiertas
-            while (!cajaEnMostrador || cajaLista || ((peso + capacidadAct) > capacidadMax)) {
-                robots.await();
+                // Solo confirmar una vez que no pudo colocar
                 if (!confirmo) {
-                    System.out.println("Confirmo que no pude poner un pastel de " + peso + "kg "
-                            + Thread.currentThread().getName());
+                    System.out.println(Thread.currentThread().getName() +
+                            " confirma que no puede poner pastel de " + peso + " kg");
                     confirmaciones++;
                     confirmo = true;
                 }
-                if (confirmaciones == cantidadRobots) {
-                    System.out.println("se llegaron a las 3 confirmaciones, despierto al brazo "
-                            + Thread.currentThread().getName());
-                    cajaLista = true;
-                    confirmaciones = 0;
-                    brazo.signal();
+
+                // Si todos confirmaron → pedir al brazo que reemplace la caja
+                if (confirmaciones >= cantidadRobots) {
+                    System.out.println(Thread.currentThread().getName() +
+                            " detecta todas las confirmaciones (" + confirmaciones + "), aviso al brazo");
+                    cajaLista = true; // señal de que debe retirarse
+                    confirmaciones = 0; // reiniciar para próxima caja
+                    brazo.signal(); // despertar al brazo
                 }
+
+                // Esperar a que la situación cambie (brazo reponga, etc.)
+                robots.await();
             }
 
-            System.out.println("Puse un pastel " + Thread.currentThread().getName());
-            capacidadAct += peso;
+            // Si llegó acá, puede colocar el pastel
+            System.out.println(Thread.currentThread().getName() +
+                    " coloca pastel de " + peso + " kg en la caja");
 
-            if (capacidadAct == capacidadMax) {
-                System.out.println("Termine la caja, despierto al brazo "
-                        + Thread.currentThread().getName());
+            capacidadAct += peso;
+            confirmo = false; // reset local (no necesario, pero claro)
+
+            // Si se llenó justo la caja
+            if (capacidadAct >= capacidadMax) {
+                System.out.println(Thread.currentThread().getName() +
+                        " completó la caja, aviso al brazo para retirar");
                 cajaLista = true;
                 confirmaciones = 0;
                 brazo.signal();
             }
 
+            // Avisar a otros robots que algo cambió (quizás ahora sí entre su pastel)
+            robots.signalAll();
+
         } catch (InterruptedException e) {
-            // TODO: handle exception
+            Thread.currentThread().interrupt();
         } finally {
             lock.unlock();
         }
