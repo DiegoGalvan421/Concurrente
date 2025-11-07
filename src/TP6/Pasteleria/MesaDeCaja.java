@@ -51,7 +51,7 @@ public class MesaDeCaja {
         lock.lock();
         boolean confirmo = false;
         try {
-            // Esperar hasta que haya caja y que quepa el pastel
+            // Esperar hasta que haya caja y que entre el pastel
             while (!cajaEnMostrador || cajaLista || (capacidadAct + peso > capacidadMax)) {
 
                 // Solo confirmar una vez que no pudo colocar
@@ -66,9 +66,9 @@ public class MesaDeCaja {
                 if (confirmaciones >= cantidadRobots) {
                     System.out.println(Thread.currentThread().getName() +
                             " detecta todas las confirmaciones (" + confirmaciones + "), aviso al brazo");
-                    cajaLista = true; // señal de que debe retirarse
-                    confirmaciones = 0; // reiniciar para próxima caja
-                    brazo.signal(); // despertar al brazo
+                    cajaLista = true; 
+                    confirmaciones = 0; 
+                    brazo.signal(); 
                 }
 
                 // Esperar a que la situación cambie (brazo reponga, etc.)
@@ -80,7 +80,7 @@ public class MesaDeCaja {
                     " coloca pastel de " + peso + " kg en la caja");
 
             capacidadAct += peso;
-            confirmo = false; // reset local (no necesario, pero claro)
+            confirmo = false;
 
             // Si se llenó justo la caja
             if (capacidadAct >= capacidadMax) {
@@ -91,7 +91,7 @@ public class MesaDeCaja {
                 brazo.signal();
             }
 
-            // Avisar a otros robots que algo cambió (quizás ahora sí entre su pastel)
+            // Avisar a otros robots que algo cambió
             robots.signalAll();
 
         } catch (InterruptedException e) {
