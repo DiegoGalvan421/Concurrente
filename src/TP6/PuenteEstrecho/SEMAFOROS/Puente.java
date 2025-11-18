@@ -4,7 +4,7 @@ import java.util.concurrent.Semaphore;
 
 public class Puente {
     private Semaphore mutex = new Semaphore(1,true);
-    private Semaphore sur = new Semaphore(1,true);
+    private Semaphore sur = new Semaphore(0,true);
     private Semaphore norte = new Semaphore(0,true);
     private Semaphore pasar = new Semaphore(1,true);
     private int norteEnEspera = 0;
@@ -19,6 +19,10 @@ public class Puente {
         mutex.acquire();
         norteEnEspera++;
         System.out.println("Estoy esperando a cruzar norte " + Thread.currentThread().getName());
+        if(surEnEspera==0 && curcesSeguidos==0){
+            System.out.println("Empezamos a pasar desde el norte");
+            norte.release();
+        }
         mutex.release();
         norte.acquire();
         pasar.acquire();
@@ -29,11 +33,12 @@ public class Puente {
         mutex.acquire();
         norteEnEspera--;
         curcesSeguidos++;
-        if ((surEnEspera > 0 && curcesSeguidos<5)|| norteEnEspera==0) {
-            System.out.println("no hay sur en espera, seguimos norte");
+        if ((norteEnEspera > 0 && curcesSeguidos<5)|| surEnEspera==0) {
+            System.out.println("No alcanzamos los 5 cruces o no hay en espera norte, seguimos Norte");
             norte.release();
         } else {
-            System.out.println("Cambiamos direccion porque hay en espera sur");
+            System.out.println("Alcanzamos los 5 cruces seguidos y hay Sur en espera, cambiamos");
+            curcesSeguidos=0;
             sur.release();
         }
         System.out.println("Termine de cruzar Norte" + Thread.currentThread().getName());
@@ -44,12 +49,14 @@ public class Puente {
         mutex.acquire();
         surEnEspera--;
         curcesSeguidos++;
-        if ((norteEnEspera > 1 && curcesSeguidos<5)|| surEnEspera==0) {
-            System.out.println("no hay norte en espera, seguimos sur");
+        if ((surEnEspera > 0 && curcesSeguidos<5)|| norteEnEspera==0) {
+            System.out.println("No alcanzamos los 5 cruces o no hay en espera norte, seguimos sur");
             sur.release();
         } else {
-            System.out.println("Cambiamos direccion porque hay en espera norte");
+            System.out.println("Alcanzamos los 5 cruces seguidos y hay norte en espera, cambiamos");
+            curcesSeguidos=0;
             norte.release();
+
         }
         System.out.println("Termine de cruzar Sur" + Thread.currentThread().getName());
         pasar.release();
@@ -59,6 +66,10 @@ public class Puente {
         mutex.acquire();
         surEnEspera++;
         System.out.println("Estoy esperando a cruzar sur " + Thread.currentThread().getName());
+        if(norteEnEspera==0 && curcesSeguidos==0){
+            System.out.println("Empezamos a pasar desde el sur");
+            sur.release();
+        }
         mutex.release();
         sur.acquire();
         pasar.acquire();
