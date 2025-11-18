@@ -50,38 +50,29 @@ public class MesaDeCaja {
     public void soltarPastel(int peso) {
         lock.lock();
         boolean coloco = false;
-        boolean confirmo = false;
+        boolean confirmo=false;
         try {
-            // corregir que no tire el pastel
+                // corregir que no tire el pastel
 
-            // si se vuelve a despertar es solo porque el brazo despiertas
-            while (!cajaEnMostrador || cajaLista || ((peso + capacidadAct) > capacidadMax)) {
-                robots.await();
-                if (!confirmo) {
+                //si se vuelve a despertar es solo porque el brazo despiertas
+                while (!cajaEnMostrador || cajaLista) {
+                    robots.await();
+                }
+                if ((peso + capacidadAct) > capacidadMax) {
                     System.out.println("Confirmo que no pude poner un pastel de " + peso + "kg "
                             + Thread.currentThread().getName());
                     confirmaciones++;
-                    confirmo = true;
+                } else {
+                    System.out.println("Puse un pastel " + Thread.currentThread().getName());
+                    capacidadAct += peso;
                 }
-                if (confirmaciones == cantidadRobots) {
-                    System.out.println("se llegaron a las 3 confirmaciones, despierto al brazo "
+                if (capacidadAct == capacidadMax || confirmaciones == cantidadRobots) {
+                    System.out.println("Termine la caja o se llegaron a las 3 confirmaciones, despierto al brazo "
                             + Thread.currentThread().getName());
                     cajaLista = true;
                     confirmaciones = 0;
                     brazo.signal();
                 }
-            }
-
-            System.out.println("Puse un pastel " + Thread.currentThread().getName());
-            capacidadAct += peso;
-
-            if (capacidadAct == capacidadMax) {
-                System.out.println("Termine la caja, despierto al brazo "
-                        + Thread.currentThread().getName());
-                cajaLista = true;
-                confirmaciones = 0;
-                brazo.signal();
-            }
 
         } catch (InterruptedException e) {
             // TODO: handle exception
