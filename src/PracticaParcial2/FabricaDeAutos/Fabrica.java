@@ -3,7 +3,11 @@ package PracticaParcial2.FabricaDeAutos;
 import java.util.concurrent.Semaphore;
 
 public class Fabrica {
-    private Semaphore mutex = new Semaphore(1, true);
+    private Semaphore [] mutex= new Semaphore[]{
+        new Semaphore(1,true),
+        new Semaphore(1,true),
+        new Semaphore(1,true),
+    };
     private Semaphore ruedas;// semaforo para controlar la produccion de objetos
     private Semaphore puertas;
     private Semaphore carrocerias;
@@ -26,27 +30,27 @@ public class Fabrica {
      
     public void producirRuedas()throws InterruptedException{
         ruedas.acquire();
-        mutex.acquire();
+        mutex[0].acquire();
         System.out.println("Produje una rueda");
         ruedasListas.release();
         cajaRuedas--;
-        mutex.release();
+        mutex[0].release();
     }
     public void producirPuertas()throws InterruptedException{
         puertas.acquire();
-        mutex.acquire();
+        mutex[1].acquire();
         System.out.println("Produje una puerta");
         puertasListas.release();
         cajaPuertas--;
-        mutex.release();
+        mutex[1].release();
     }
     public void producirCarroceria()throws InterruptedException{
         carrocerias.acquire();
-        mutex.acquire();
+        mutex[2].acquire();
         System.out.println("Produje una carroceria");
         carroceriasListas.release();
         cajaCarrocerias--;
-        mutex.release();
+        mutex[2].release();
     }
     public void fabricarAuto()throws InterruptedException{
         ruedasListas.acquire(4);
@@ -55,7 +59,9 @@ public class Fabrica {
         System.out.println("Ya separe las 2 puertas");
         carroceriasListas.acquire(1);
         System.out.println("Ya separe la carroceria");
-        mutex.acquire();
+        mutex[0].acquire();
+        mutex[1].acquire();
+        mutex[2].acquire();
         System.out.println("Estoy armando el auto");
         cajaRuedas+=4;
         cajaPuertas+=2;
@@ -68,6 +74,8 @@ public class Fabrica {
             System.out.println("Se termino el lote, procedemos a empaquetarlos y dejarlos listos");
             autosArmados=0;
         }
-        mutex.release();
+        mutex[0].release();
+        mutex[1].release();
+        mutex[2].release();
     }
 }
