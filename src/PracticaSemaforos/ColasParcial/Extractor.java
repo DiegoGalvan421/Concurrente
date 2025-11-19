@@ -11,6 +11,7 @@ public class Extractor implements Runnable {
         while (true) {
             try {
                 Object ob = col.extraer();
+                Thread.sleep(400);
             } catch (Exception e) {
                 // TODO: handle exception
             }

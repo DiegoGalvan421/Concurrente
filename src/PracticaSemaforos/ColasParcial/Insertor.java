@@ -11,6 +11,7 @@ public class Insertor implements Runnable{
         while(true){
             try {
                 col.insertar(1);
+                Thread.sleep(400);
             } catch (InterruptedException e) {
                 // TODO: handle exception
             }
