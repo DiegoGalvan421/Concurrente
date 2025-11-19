@@ -49,20 +49,6 @@ public class MesaDeCaja {
 
     public void soltarPastel(int peso) {
         lock.lock();
-<<<<<<< HEAD
-        boolean coloco = false;
-        boolean confirmo=false;
-        try {
-                // corregir que no tire el pastel
-
-                //si se vuelve a despertar es solo porque el brazo despiertas
-                while (!cajaEnMostrador || cajaLista) {
-                    robots.await();
-                }
-                if ((peso + capacidadAct) > capacidadMax) {
-                    System.out.println("Confirmo que no pude poner un pastel de " + peso + "kg "
-                            + Thread.currentThread().getName());
-=======
         boolean confirmo = false;
         try {
             // Esperar hasta que haya caja y que entre el pastel
@@ -72,21 +58,11 @@ public class MesaDeCaja {
                 if (!confirmo) {
                     System.out.println(Thread.currentThread().getName() +
                             " confirma que no puede poner pastel de " + peso + " kg");
->>>>>>> a988ccca3466456b2f27c6efc78e8d4c311031c7
                     confirmaciones++;
                 } else {
                     System.out.println("Puse un pastel " + Thread.currentThread().getName());
                     capacidadAct += peso;
                 }
-<<<<<<< HEAD
-                if (capacidadAct == capacidadMax || confirmaciones == cantidadRobots) {
-                    System.out.println("Termine la caja o se llegaron a las 3 confirmaciones, despierto al brazo "
-                            + Thread.currentThread().getName());
-                    cajaLista = true;
-                    confirmaciones = 0;
-                    brazo.signal();
-                }
-=======
 
                 // Si todos confirmaron → pedir al brazo que reemplace la caja
                 if (confirmaciones >= cantidadRobots) {
@@ -116,7 +92,6 @@ public class MesaDeCaja {
                 confirmaciones = 0;
                 brazo.signal();
             }
->>>>>>> a988ccca3466456b2f27c6efc78e8d4c311031c7
 
             // Avisar a otros robots que algo cambió
             robots.signalAll();
